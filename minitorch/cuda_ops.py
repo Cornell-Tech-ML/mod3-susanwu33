@@ -534,10 +534,14 @@ def _tensor_matrix_multiply(
         # Load a chunk of `a` into shared memory
         if i < a_shape[-2] and k * BLOCK_DIM + pj < a_shape[-1]:
             a_shared[pi, pj] = a_storage[batch * a_batch_stride + i * a_strides[-2] + (k * BLOCK_DIM + pj) * a_strides[-1]]
+        else:
+            a_shared[pi, pj] = 0.0
 
         # Load a chunk of `b` into shared memory
         if j < b_shape[-1] and k * BLOCK_DIM + pi < b_shape[-2]:
             b_shared[pi, pj] = b_storage[batch * b_batch_stride + (k * BLOCK_DIM + pi) * b_strides[-2] + j * b_strides[-1]]
+        else:
+            b_shared[pi, pj] = 0.0
 
         # Synchronize threads to ensure shared memory is fully populated
         cuda.syncthreads()
