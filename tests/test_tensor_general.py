@@ -46,7 +46,7 @@ if numba.cuda.is_available():
 @pytest.mark.parametrize("backend", backend_tests)
 def test_create(backend: str, t1: List[float]) -> None:
     """Create different tensors."""
-    t2 = minitorch.tensor(t1, backend=shared[backend])
+    t2 = minitorch.tensor_functions.tensor(t1, backend=shared[backend])
     for i in range(len(t1)):
         assert t1[i] == t2[i]
 
@@ -134,9 +134,9 @@ if numba.cuda.is_available():
     @pytest.mark.task3_3
     def test_sum_practice() -> None:
         x = [random.random() for i in range(16)]
-        b = minitorch.tensor(x)
+        b = minitorch.tensor_functions.tensor(x)
         s = b.sum()[0]
-        b2 = minitorch.tensor(x, backend=shared["cuda"])
+        b2 = minitorch.tensor_functions.tensor(x, backend=shared["cuda"])
         out = minitorch.sum_practice(b2)
         assert_close(s, out._storage[0])
 

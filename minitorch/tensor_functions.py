@@ -135,7 +135,10 @@ class Mul(Function):
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, Tensor]:
         """Backward pass for element-wise multiplication."""
         (a, b) = ctx.saved_values
-        return (grad_output.f.mul_zip(grad_output, b), grad_output.f.mul_zip(grad_output, a))  # Use backend for gradients
+        return (
+            grad_output.f.mul_zip(grad_output, b),
+            grad_output.f.mul_zip(grad_output, a),
+        )  # Use backend for gradients
 
 
 class Sigmoid(Function):
@@ -232,7 +235,7 @@ class EQ(Function):
         return a.f.eq_zip(a, b)  # Use the backend's equality method
 
     @staticmethod
-    def backward(ctx: Context, grad_output: Tensor) -> Tuple[float, float]:
+    def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, Tensor]:
         """Backward pass for equality comparison (no gradient)."""
         a_shape, b_shape = ctx.saved_values
         return zeros(a_shape), zeros(b_shape)

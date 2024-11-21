@@ -101,7 +101,7 @@ class FastTrain:
 
             end_time = time.time()  # Record end time
             epoch_time = end_time - start_time  # Calculate duration
-            
+
             # Logging
             if epoch % 10 == 0 or epoch == max_epochs:
                 X = minitorch.tensor(data.X, backend=self.backend)

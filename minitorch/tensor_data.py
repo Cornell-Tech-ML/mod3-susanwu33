@@ -113,7 +113,7 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
     c_rev = [0] * m
     a_rev = list(reversed(a))
     b_rev = list(reversed(b))
-    for i in range(m): 
+    for i in range(m):
         if i >= len(a):
             c_rev[i] = b_rev[i]
         elif i >= len(b):
@@ -125,7 +125,6 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
             if b_rev[i] != c_rev[i] and b_rev[i] != 1:
                 raise IndexingError(f"Broadcast failure {a} {b}")
     return tuple(reversed(c_rev))
-
 
 
 def strides_from_shape(shape: UserShape) -> UserStrides:

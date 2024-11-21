@@ -1,3 +1,5 @@
+"""The minitorch package provides various tensor operations, autodiff capabilities, and optimizers for machine learning tasks."""
+
 from .testing import MathTest, MathTestVariable  # type: ignore # noqa: F401,F403
 from .fast_ops import *  # noqa: F401,F403
 from .cuda_ops import *  # noqa: F401,F403

@@ -29,11 +29,35 @@ FakeCUDAKernel = Any
 Fn = TypeVar("Fn")
 
 
-def device_jit(fn: Fn, **kwargs) -> Fn:
+def device_jit(fn: Fn, **kwargs: Any) -> Fn:
+    """JIT compile a function for execution on the CUDA device.
+
+    Args:
+    ----
+        fn: The function to be compiled.
+        **kwargs: Additional keyword arguments for the JIT compiler.
+
+    Returns:
+    -------
+        The JIT-compiled function that can be executed on the CUDA device.
+
+    """
     return _jit(device=True, **kwargs)(fn)  # type: ignore
 
 
-def jit(fn, **kwargs) -> FakeCUDAKernel:
+def jit(fn: Callable[..., FakeCUDAKernel], **kwargs: Any) -> FakeCUDAKernel:
+    """JIT compile a function for execution on the CUDA device.
+
+    Args:
+    ----
+        fn: The function to be compiled.
+        **kwargs: Additional keyword arguments for the JIT compiler.
+
+    Returns:
+    -------
+        A JIT-compiled function that can be executed on the CUDA device.
+
+    """
     return _jit(**kwargs)(fn)  # type: ignore
 
 
@@ -70,11 +94,13 @@ class CudaOps(TensorOps):
         """Applies a binary function to two tensors element-wise.
 
         Args:
+        ----
             fn: A function that takes two floats and returns a float.
 
         Returns:
+        -------
             A callable that takes two Tensors and returns a Tensor.
-            
+
         """
         cufn: Callable[[float, float], float] = device_jit(fn)
         f = tensor_zip(cufn)
@@ -98,12 +124,14 @@ class CudaOps(TensorOps):
         """Reduce function that applies a binary operation over a specified dimension.
 
         Args:
+        ----
             fn: A function that takes two floats and returns a float.
             start: The initial value for the reduction.
 
         Returns:
+        -------
             A callable that takes a Tensor and a dimension index, returning a reduced Tensor.
-            
+
         """
         cufn: Callable[[float, float], float] = device_jit(fn)
         f = tensor_reduce(cufn)
@@ -128,10 +156,12 @@ class CudaOps(TensorOps):
         """Perform matrix multiplication on two tensors.
 
         Args:
+        ----
             a (Tensor): The first tensor to multiply.
             b (Tensor): The second tensor to multiply.
 
         Returns:
+        -------
             Tensor: The result of the matrix multiplication.
 
         """
@@ -203,7 +233,7 @@ def tensor_map(
         in_index = cuda.local.array(MAX_DIMS, numba.int32)
         i = cuda.blockIdx.x * cuda.blockDim.x + cuda.threadIdx.x
         # TODO: Implement for Task 3.3.
-        
+
         if i < out_size:
             to_index(i, out_shape, out_index)
             broadcast_index(out_index, out_shape, in_shape, in_index)
@@ -255,16 +285,16 @@ def tensor_zip(
         if i < out_size:
             # Convert the flat index `i` to a multi-dimensional `out_index`.
             to_index(i, out_shape, out_index)
-            
+
             # Compute the broadcasted `a_index` and `b_index` from `out_index`.
             broadcast_index(out_index, out_shape, a_shape, a_index)
             broadcast_index(out_index, out_shape, b_shape, b_index)
-            
+
             # Get the flattened positions for output, a, and b storages.
             o = index_to_position(out_index, out_strides)
             j = index_to_position(a_index, a_strides)
             k = index_to_position(b_index, b_strides)
-            
+
             # Apply the function `fn` to `a_storage[j]` and `b_storage[k]` and store in `out`.
             out[o] = fn(a_storage[j], b_storage[k])
 
@@ -288,7 +318,7 @@ def _sum_practice(out: Storage, a: Storage, size: int) -> None:
     pos = cuda.threadIdx.x
 
     # TODO: Implement for Task 3.3.
-    
+
     # Global index
     i = cuda.blockIdx.x * cuda.blockDim.x + pos
 
@@ -321,9 +351,11 @@ def sum_practice(a: Tensor) -> TensorData:
     """Compute the sum of elements in a tensor.
 
     Args:
+    ----
         a (Tensor): Input tensor to sum.
 
     Returns:
+    -------
         TensorData: Tensor containing the sum of elements.
 
     """
@@ -380,7 +412,9 @@ def tensor_reduce(
             initial_a_pos = index_to_position(out_index, a_strides)
 
             for i in range(a_shape[reduce_dim]):
-                cache[pos] = fn(cache[out_pos], a_storage[initial_a_pos + i * a_strides[reduce_dim]])
+                cache[pos] = fn(
+                    cache[out_pos], a_storage[initial_a_pos + i * a_strides[reduce_dim]]
+                )
 
         cuda.syncthreads()
         if pos == 0 and cuda.blockIdx.x < out_size:
@@ -446,7 +480,6 @@ def _mm_practice(out: Storage, a: Storage, b: Storage, size: int) -> None:
 
         # Write the result to global memory
         out[ty * size + tx] = result
-    
 
 
 jit_mm_practice = jit(_mm_practice)
@@ -456,10 +489,12 @@ def mm_practice(a: Tensor, b: Tensor) -> TensorData:
     """Compute the matrix multiplication of two tensors.
 
     Args:
+    ----
         a (Tensor): The first tensor to multiply.
         b (Tensor): The second tensor to multiply.
 
     Returns:
+    -------
         TensorData: The result of the matrix multiplication.
 
     """
@@ -533,13 +568,21 @@ def _tensor_matrix_multiply(
     for k in range((a_shape[-1] + BLOCK_DIM - 1) // BLOCK_DIM):
         # Load a chunk of `a` into shared memory
         if i < a_shape[-2] and k * BLOCK_DIM + pj < a_shape[-1]:
-            a_shared[pi, pj] = a_storage[batch * a_batch_stride + i * a_strides[-2] + (k * BLOCK_DIM + pj) * a_strides[-1]]
+            a_shared[pi, pj] = a_storage[
+                batch * a_batch_stride
+                + i * a_strides[-2]
+                + (k * BLOCK_DIM + pj) * a_strides[-1]
+            ]
         else:
             a_shared[pi, pj] = 0.0
 
         # Load a chunk of `b` into shared memory
         if j < b_shape[-1] and k * BLOCK_DIM + pi < b_shape[-2]:
-            b_shared[pi, pj] = b_storage[batch * b_batch_stride + (k * BLOCK_DIM + pi) * b_strides[-2] + j * b_strides[-1]]
+            b_shared[pi, pj] = b_storage[
+                batch * b_batch_stride
+                + (k * BLOCK_DIM + pi) * b_strides[-2]
+                + j * b_strides[-1]
+            ]
         else:
             b_shared[pi, pj] = 0.0
 

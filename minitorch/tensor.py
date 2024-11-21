@@ -408,23 +408,33 @@ class Tensor:
     def sum(self, dim: Optional[int] = None) -> Tensor:
         """Computes the sum of the tensor elements along the specified dimension."""
         if dim is None:
-            return Sum.apply(self.contiguous().view(self.size), self._ensure_tensor(0))  # Call Sum.apply without dim
+            return Sum.apply(
+                self.contiguous().view(self.size), self._ensure_tensor(0)
+            )  # Call Sum.apply without dim
         else:
             # Ensure dim is a tensor
-            dim_tensor = self._ensure_tensor(dim)  # Convert dim to a tensor if necessary
+            dim_tensor = self._ensure_tensor(
+                dim
+            )  # Convert dim to a tensor if necessary
             return Sum.apply(self, dim_tensor)  # Pass the dim tensor to Sum.apply
 
     def mean(self, dim: Optional[int] = None) -> Tensor:
         """Computes the mean of the tensor elements along the specified dimension."""
         if dim is not None:
-            return (self.sum(dim) / self.shape[dim])  # Sum along the dimension and divide by its size
+            return (
+                self.sum(dim) / self.shape[dim]
+            )  # Sum along the dimension and divide by its size
         else:
             return self.sum() / self.size  # Sum all elements and divide by total size
 
     def permute(self, *dims: int) -> Tensor:
         """Permutes the dimensions of the input tensor according to the specified order."""
-        return Permute.apply(self, Tensor.make(list(dims), (len(dims),), backend=self.backend))
+        return Permute.apply(
+            self, Tensor.make(list(dims), (len(dims),), backend=self.backend)
+        )
 
     def view(self, *shape: int) -> Tensor:
         """Reshapes the tensor to the specified shape."""
-        return View.apply(self, Tensor.make(list(shape), (len(shape),), backend=self.backend))
+        return View.apply(
+            self, Tensor.make(list(shape), (len(shape),), backend=self.backend)
+        )
