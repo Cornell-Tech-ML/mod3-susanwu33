@@ -35,13 +35,20 @@ The files that will be synced are:
 **Task 3.1 & 3.2**
 
 **Diagnostics output**
-<img src="diagnostic_output/fig1.png" alt="Diagnostic Output 1" width="400">
-<img src="diagnostic_output/fig2.png" alt="Disgnostic Output 2" width="400">
-<img src="diagnostic_output/fig3.png" alt="Disgnostic Output 3" width="400">
-<img src="diagnostic_output/fig4.png" alt="Disgnostic Output 4" width="400">
-<img src="diagnostic_output/fig5.png" alt="Disgnostic Output 5" width="400">
-<img src="diagnostic_output/fig6.png" alt="Disgnostic Output 6" width="400">
-<img src="diagnostic_output/fig7.png" alt="Disgnostic Output 7" width="400">
+
+<img src="diagnostic_output/fig1.png" alt="Diagnostic Output 1" width="400"><br>
+
+<img src="diagnostic_output/fig2.png" alt="Disgnostic Output 2" width="400"><br>
+
+<img src="diagnostic_output/fig3.png" alt="Disgnostic Output 3" width="400"><br>
+
+<img src="diagnostic_output/fig4.png" alt="Disgnostic Output 4" width="400"><br>
+
+<img src="diagnostic_output/fig5.png" alt="Disgnostic Output 5" width="400"><br>
+
+<img src="diagnostic_output/fig6.png" alt="Disgnostic Output 6" width="400"><br>
+
+<img src="diagnostic_output/fig7.png" alt="Disgnostic Output 7" width="400"><br>
 
 
 **Task 3.5**
