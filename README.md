@@ -51,6 +51,13 @@ The files that will be synced are:
 <img src="diagnostic_output/fig7.png" alt="Disgnostic Output 7" width="400"><br>
 
 
+**Task 3.4**
+
+* Comparison Graph of MatMul with GPU and naive operation.
+
+<img src="diagnostic_output/task3.4_graph.png" alt="Comparison Graph" width="400"><br>
+
+
 **Task 3.5**
 
 **Split Dataset**
